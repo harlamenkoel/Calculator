@@ -2,16 +2,13 @@ import java.util.Objects;
 import java.util.Scanner;
 
 public class Calculator {
-    public static void main(String[] args) {
-        Converter converter = new Converter();
-        String[] sing = {"+", "-", "/", "*" };
-        String[] regexSing = {"\\+", "-", "/", "\\*" };
-        Scanner scn = new Scanner(System.in);
+    public static String calc(String input) {
+        int result = 0;
 
-        System.out.print("Введите выражение: ");
-        String input = scn.nextLine();
-
+        String[] sing = {"+", "-", "/", "*"};
+        String[] regexSing = {"\\+", "-", "/", "\\*"};
         int expressionLength = 2;
+
         if (input.length() <= expressionLength) {
             try {
                 throw new Exception();
@@ -26,7 +23,6 @@ public class Calculator {
                 if (input.contains(sing[i])) {
                     actionIndex = i;
                     break;
-
                 }
             }
 
@@ -37,12 +33,14 @@ public class Calculator {
                     System.out.println("Неверено задан оператор");
                 }
             } else {
+                Converter converter = new Converter();
                 String[] expression = input.split(regexSing[actionIndex]);
+
                 if (expression.length > expressionLength) {
                     try {
                         throw new Exception();
                     } catch (Exception m) {
-                        System.out.println("Формат математической операции не удовлетворяет заданию - два операнда и один оператор3");
+                        System.out.println("Формат математической операции не удовлетворяет заданию - два операнда и один оператор");
                     }
                 } else if (converter.isNumberSystem(expression[0]) == converter.isNumberSystem(expression[1])) {
                     int numberOne, numberTwo;
@@ -63,25 +61,25 @@ public class Calculator {
                             System.out.println("Размер вводимых чисел не удовлетворяет заданию");
                         }
                     } else {
-                        int result = switch (sing[actionIndex]) {
+                        result = switch (sing[actionIndex]) {
                             case "+" -> numberOne + numberTwo;
                             case "-" -> numberOne - numberTwo;
                             case "*" -> numberOne * numberTwo;
                             default -> numberOne / numberTwo;
                         };
 
-                        if (isRomanDigits) {
-                            if (Objects.equals(converter.arabicToRoman(result), "0")) {
-                                try {
-                                    throw new Exception();
-                                } catch (Exception d) {
-                                    System.out.println("Результатом работы с римскими числами могут быть только положительные числа");
-                                }
-                            } else {
-                                System.out.println("Результат вашего выражения: " + converter.arabicToRoman(result));
+                        if (isRomanDigits && result <= 0) {
+                            try {
+                                throw new Exception();
+                            } catch (Exception d) {
+                                System.out.println("Результатом работы с римскими числами могут быть только положительные числа");
                             }
+                        }
+
+                        if (isRomanDigits) {
+                            return converter.arabicToRoman(result);
                         } else {
-                            System.out.println("Результат вашего выражения: " + result);
+                            return String.valueOf(result);
                         }
                     }
                 } else {
@@ -93,5 +91,15 @@ public class Calculator {
                 }
             }
         }
+        return String.valueOf(result);
+    }
+
+    public static void main(String[] args) {
+        Scanner scn = new Scanner(System.in);
+
+        System.out.print("Введите выражение: ");
+        String input = scn.nextLine();
+
+        if (!Objects.equals(calc(input), "0")) System.out.println("Резултат вашего выражения: " + calc(input));
     }
 }
